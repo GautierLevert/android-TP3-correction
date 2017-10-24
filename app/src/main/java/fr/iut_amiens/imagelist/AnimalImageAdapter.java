@@ -61,11 +61,11 @@ public class AnimalImageAdapter extends BaseAdapter {
 
         AnimalImage image = getItem(position);
 
-        TextView titleView = (TextView) view.findViewById(R.id.imageTitle);
+        TextView titleView = view.findViewById(R.id.imageTitle);
         titleView.setText(image.getTitle());
 
-        ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        ProgressBar loading = (ProgressBar) view.findViewById(R.id.loading);
+        ImageView imageView = view.findViewById(R.id.imageView);
+        ProgressBar loading = view.findViewById(R.id.loading);
 
         if (imageCache.isImageDownloaded(image)) {
             imageView.setImageURI(imageCache.getLocalData(image));

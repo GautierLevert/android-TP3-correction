@@ -17,7 +17,7 @@ public class ViewActivity extends Activity {
 
         AnimalImage image = (AnimalImage) getIntent().getSerializableExtra(EXTRA_IMAGE);
         setTitle(image.getTitle());
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        ImageView imageView = findViewById(R.id.imageView);
 
         File imageCacheDirectory = new File(getCacheDir(), "images");
 
