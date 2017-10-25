@@ -57,7 +57,7 @@ public class AnimalImageAdapter extends RecyclerView.Adapter<AnimalImageViewHold
     }
 
     public void clear() {
-        notifyItemRangeRemoved(0, images.size() - 1);
+        notifyItemRangeRemoved(0, images.size());
         images.clear();
     }
 

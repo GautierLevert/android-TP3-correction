@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/imageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/imageTitle" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <FrameLayout
+        android:id="@+id/placeholder"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:id="@+id/placeholder">
+        android:layout_height="240dp">
 
         <ImageView
-            android:visibility="gone"
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/imageView"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/image_description"
-            android:adjustViewBounds="true"/>
+            android:visibility="gone" />
 
         <ProgressBar
+            android:id="@+id/loading"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/loading"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:visibility="visible" />
 
     </FrameLayout>
 </LinearLayout>
