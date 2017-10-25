@@ -1,34 +1,28 @@
 package fr.iut_amiens.imagelist;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import java.io.File;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
     private AnimalImageAdapter adapter;
 
-    private ImageLoader imageLoader;
+    private int insert = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        File imageCacheDirectory = new File(getCacheDir(), "images");
-
-        if (!imageCacheDirectory.exists()) {
-            imageCacheDirectory.mkdirs();
-        }
-
-        imageLoader = new ImageLoader(imageCacheDirectory);
-
-        adapter = new AnimalImageAdapter(getLayoutInflater(), imageLoader);
+        adapter = new AnimalImageAdapter(getLayoutInflater());
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -36,8 +30,6 @@ public class MainActivity extends Activity {
         recyclerView.setAdapter(adapter);
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
-            private int insert = 0;
-
             @Override
             public void onClick(View v) {
                 if (insert >= AnimalImage.ANIMAL_IMAGE_LIST.size()) {
@@ -52,16 +44,15 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 adapter.clear();
-                imageLoader.clearCache();
             }
         });
 
-        /* listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        adapter.setOnAnimalImageClickListener(new AnimalImageAdapter.OnAnimalImageClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                startActivity(new Intent(MainActivity.this, ViewActivity.class).putExtra(ViewActivity.EXTRA_IMAGE, adapter.getItem(position)));
+            public void onClick(AnimalImage image) {
+                startActivity(new Intent(MainActivity.this, ViewActivity.class).putExtra(ViewActivity.EXTRA_IMAGE, image));
             }
-        }); */
+        });
     }
 
     @Override
@@ -69,11 +60,13 @@ public class MainActivity extends Activity {
         super.onSaveInstanceState(outState);
         ArrayList<AnimalImage> list = new ArrayList<>(adapter.getAll());
         outState.putSerializable("adapter", list);
+        outState.putInt("insert", insert);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         adapter.addAll((ArrayList<AnimalImage>) savedInstanceState.getSerializable("adapter"));
+        insert = savedInstanceState.getInt("insert");
     }
 }

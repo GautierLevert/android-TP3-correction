@@ -4,8 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ImageView;
 
-import java.io.File;
-import java.io.IOException;
+import com.squareup.picasso.Picasso;
 
 public class ViewActivity extends Activity {
 
@@ -18,19 +17,11 @@ public class ViewActivity extends Activity {
 
         AnimalImage image = (AnimalImage) getIntent().getSerializableExtra(EXTRA_IMAGE);
         setTitle(image.getTitle());
+
         ImageView imageView = findViewById(R.id.imageView);
 
-        File imageCacheDirectory = new File(getCacheDir(), "images");
-
-        if (!imageCacheDirectory.exists()) {
-            imageCacheDirectory.mkdirs();
-        }
-
-        ImageLoader cache = new ImageLoader(imageCacheDirectory);
-        try {
-            imageView.setImageBitmap(cache.getLocalData(image));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Picasso.with(this)
+                .load(image.getImageUrl().toString())
+                .into(imageView);
     }
 }

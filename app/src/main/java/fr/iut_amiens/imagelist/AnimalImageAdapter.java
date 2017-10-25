@@ -1,5 +1,6 @@
 package fr.iut_amiens.imagelist;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,15 +12,29 @@ import java.util.List;
 
 public class AnimalImageAdapter extends RecyclerView.Adapter<AnimalImageViewHolder> {
 
+    public interface OnAnimalImageClickListener {
+        void onClick(AnimalImage image);
+    }
+
     private ArrayList<AnimalImage> images = new ArrayList<>();
 
     private LayoutInflater layoutInflater;
 
-    private ImageLoader imageLoader;
+    @Nullable
+    private OnAnimalImageClickListener onAnimalImageClickListener;
 
-    public AnimalImageAdapter(LayoutInflater layoutInflater, ImageLoader imageLoader) {
+    public AnimalImageAdapter(LayoutInflater layoutInflater) {
         this.layoutInflater = layoutInflater;
-        this.imageLoader = imageLoader;
+    }
+
+    @Nullable
+    public OnAnimalImageClickListener getOnAnimalImageClickListener() {
+        return onAnimalImageClickListener;
+    }
+
+    public void setOnAnimalImageClickListener(@Nullable OnAnimalImageClickListener onAnimalImageClickListener) {
+        this.onAnimalImageClickListener = onAnimalImageClickListener;
+        notifyItemRangeChanged(0, images.size());
     }
 
     public void add(AnimalImage image) {
@@ -32,7 +47,7 @@ public class AnimalImageAdapter extends RecyclerView.Adapter<AnimalImageViewHold
     @Override
     public AnimalImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(AnimalImageAdapter.class.getSimpleName(), "create viewholder");
-        return new AnimalImageViewHolder(layoutInflater.inflate(R.layout.list_animals, parent, false), imageLoader);
+        return new AnimalImageViewHolder(layoutInflater.inflate(R.layout.list_animals, parent, false));
     }
 
     @Override
@@ -40,6 +55,7 @@ public class AnimalImageAdapter extends RecyclerView.Adapter<AnimalImageViewHold
         Log.d(AnimalImageAdapter.class.getSimpleName(), "bind position " + position);
         AnimalImage image = getItem(position);
         holder.bind(image);
+        holder.setOnAnimalImageClickListener(onAnimalImageClickListener);
     }
 
     @Override
