@@ -1,87 +1,64 @@
 package fr.iut_amiens.imagelist;
 
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class AnimalImageAdapter extends BaseAdapter {
+public class AnimalImageAdapter extends RecyclerView.Adapter<AnimalImageViewHolder> {
 
     private ArrayList<AnimalImage> images = new ArrayList<>();
 
     private LayoutInflater layoutInflater;
 
-    private ImageCache imageCache;
+    private ImageLoader imageLoader;
 
-    private List<AsyncDownloader> downloaders = new ArrayList<>();
-
-    public AnimalImageAdapter(LayoutInflater layoutInflater, ImageCache imageCache) {
+    public AnimalImageAdapter(LayoutInflater layoutInflater, ImageLoader imageLoader) {
         this.layoutInflater = layoutInflater;
-        this.imageCache = imageCache;
+        this.imageLoader = imageLoader;
     }
 
     public void add(AnimalImage image) {
+        final int position = images.size();
         images.add(image);
-        notifyDataSetChanged();
+        notifyItemInserted(position);
+        Log.d(AnimalImageAdapter.class.getSimpleName(), "add image at position " + position);
     }
 
     @Override
-    public int getCount() {
+    public AnimalImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d(AnimalImageAdapter.class.getSimpleName(), "create viewholder");
+        return new AnimalImageViewHolder(layoutInflater.inflate(R.layout.list_animals, parent, false), imageLoader);
+    }
+
+    @Override
+    public void onBindViewHolder(AnimalImageViewHolder holder, int position) {
+        Log.d(AnimalImageAdapter.class.getSimpleName(), "bind position " + position);
+        AnimalImage image = getItem(position);
+        holder.bind(image);
+    }
+
+    @Override
+    public void onViewRecycled(AnimalImageViewHolder holder) {
+        holder.recycle();
+    }
+
+    @Override
+    public int getItemCount() {
         return images.size();
     }
 
-    @Override
     public AnimalImage getItem(int position) {
         return images.get(position);
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d("ADAPTER", "getView(" + position + ")");
-
-        View view;
-        if (convertView == null) {
-            view = layoutInflater.inflate(R.layout.list_animals, parent, false);
-        } else {
-            view = convertView;
-        }
-
-        AnimalImage image = getItem(position);
-
-        TextView titleView = view.findViewById(R.id.imageTitle);
-        titleView.setText(image.getTitle());
-
-        ImageView imageView = view.findViewById(R.id.imageView);
-        ProgressBar loading = view.findViewById(R.id.loading);
-
-        if (imageCache.isImageDownloaded(image)) {
-            imageView.setImageURI(imageCache.getLocalData(image));
-            loading.setVisibility(View.GONE);
-            imageView.setVisibility(View.VISIBLE);
-        } else {
-            AsyncDownloader imageDownloader = new AsyncDownloader(imageCache, image, imageView, loading);
-            imageDownloader.execute();
-            downloaders.add(imageDownloader);
-        }
-        return view;
-    }
-
     public void clear() {
+        notifyItemRangeRemoved(0, images.size() - 1);
         images.clear();
-        notifyDataSetChanged();
     }
 
     public List<AnimalImage> getAll() {
@@ -90,11 +67,5 @@ public class AnimalImageAdapter extends BaseAdapter {
 
     public void addAll(Collection<AnimalImage> collection) {
         images.addAll(collection);
-    }
-
-    public void cancelTasks() {
-        for (AsyncDownloader downloader : downloaders) {
-            downloader.cancel(true);
-        }
     }
 }

@@ -1,6 +1,7 @@
 package fr.iut_amiens.imagelist;
 
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -9,18 +10,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-public class ImageCache {
+public class ImageLoader {
 
     private File imageCacheDirectory;
 
-    public ImageCache(File imageCacheDirectory) {
+    public ImageLoader(File imageCacheDirectory) {
         this.imageCacheDirectory = imageCacheDirectory;
     }
 
-    public void download(AnimalImage image) throws IOException, InterruptedException {
-        File localFile = new File(imageCacheDirectory, image.getFileName());
+    private File getLocalFile(AnimalImage image) {
+        return new File(imageCacheDirectory, image.getFileName());
+    }
+
+    public Bitmap load(AnimalImage image) throws IOException, InterruptedException {
+        File localFile = getLocalFile(image);
         if (localFile.exists()) {
-            return;
+            return getLocalData(image);
         }
         HttpURLConnection connection = (HttpURLConnection) image.getImageUrl().toURL().openConnection();
 
@@ -55,19 +60,21 @@ public class ImageCache {
                 }
             }
         }
+
+        return getLocalData(image);
     }
 
-    public Uri getLocalData(AnimalImage image) {
-        File localFile = new File(imageCacheDirectory, image.getFileName());
-        return Uri.fromFile(localFile);
+    public Bitmap getLocalData(AnimalImage image) throws IOException {
+        File localFile = getLocalFile(image);
+        return BitmapFactory.decodeFile(localFile.getCanonicalPath());
     }
 
     public boolean isImageDownloaded(AnimalImage image) {
-        File localFile = new File(imageCacheDirectory, image.getFileName());
+        File localFile = getLocalFile(image);
         return localFile.exists();
     }
 
-    public void deleteCache() {
+    public void clearCache() {
         for (File f : imageCacheDirectory.listFiles()) {
             f.delete();
         }

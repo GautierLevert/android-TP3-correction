@@ -1,11 +1,10 @@
 package fr.iut_amiens.imagelist;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,14 +13,12 @@ public class MainActivity extends Activity {
 
     private AnimalImageAdapter adapter;
 
-    private ImageCache imageCache;
+    private ImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ListView listView = findViewById(R.id.listView);
 
         File imageCacheDirectory = new File(getCacheDir(), "images");
 
@@ -29,11 +26,14 @@ public class MainActivity extends Activity {
             imageCacheDirectory.mkdirs();
         }
 
-        imageCache = new ImageCache(imageCacheDirectory);
+        imageLoader = new ImageLoader(imageCacheDirectory);
 
-        adapter = new AnimalImageAdapter(getLayoutInflater(), imageCache);
+        adapter = new AnimalImageAdapter(getLayoutInflater(), imageLoader);
 
-        listView.setAdapter(adapter);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             private int insert = 0;
@@ -52,16 +52,16 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 adapter.clear();
-                imageCache.deleteCache();
+                imageLoader.clearCache();
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /* listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 startActivity(new Intent(MainActivity.this, ViewActivity.class).putExtra(ViewActivity.EXTRA_IMAGE, adapter.getItem(position)));
             }
-        });
+        }); */
     }
 
     @Override
@@ -75,11 +75,5 @@ public class MainActivity extends Activity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         adapter.addAll((ArrayList<AnimalImage>) savedInstanceState.getSerializable("adapter"));
-    }
-
-    @Override
-    protected void onDestroy() {
-        adapter.cancelTasks();
-        super.onDestroy();
     }
 }

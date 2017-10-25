@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.IOException;
 
 public class ViewActivity extends Activity {
 
@@ -24,8 +25,12 @@ public class ViewActivity extends Activity {
         if (!imageCacheDirectory.exists()) {
             imageCacheDirectory.mkdirs();
         }
-        
-        ImageCache cache = new ImageCache(imageCacheDirectory);
-        imageView.setImageURI(cache.getLocalData(image));
+
+        ImageLoader cache = new ImageLoader(imageCacheDirectory);
+        try {
+            imageView.setImageBitmap(cache.getLocalData(image));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
